@@ -1,0 +1,3 @@
+/home/yigit/calcium_emu/build/CMakeFiles/calcium.dir
+/home/yigit/calcium_emu/build/CMakeFiles/edit_cache.dir
+/home/yigit/calcium_emu/build/CMakeFiles/rebuild_cache.dir
