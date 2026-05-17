@@ -1,4 +1,5 @@
 #include"rv32i.h"
+#include"bootrom/bootrom_hex.h"
 byte mem[0x8000];
 byte terminalbuffer[512];
 word read_word_from_address_space(word address,rv32i *cpu){
@@ -139,10 +140,10 @@ word fetch_instr(rv32i*cpu){
     word *ptr; 
     case 0x0:
         internal_addr = cpu->pc & 0xFFFF;
-        cpu->sys_err_table |= (( 0xC- 0x4) < internal_addr);//FETCH_ERR_MASK
+        cpu->sys_err_table |= (( bootrom_bin_len - 0x4) < internal_addr);//FETCH_ERR_MASK
         internal_addr = internal_addr *!(0xC - 0x4 < internal_addr);
         aligned_addr = internal_addr & ~0x3;
-        ptr = (word *)&bootloader[aligned_addr/4];
+        ptr = (word *)&bootrom_bin[aligned_addr];
         return *ptr;
         break;
         
