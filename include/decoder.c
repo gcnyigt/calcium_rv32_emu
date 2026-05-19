@@ -46,6 +46,7 @@ int decode(rv32i *cpu,word instr){
                     break;
             
             default:
+            cpu->sys_err_table|=UNDEFINED_OPCODE;
                 break;
         }
         break;
@@ -58,6 +59,7 @@ int decode(rv32i *cpu,word instr){
             rd1 = (instr >> 7) & 0x1F;
             rs1 = (instr >> 15) & 0x1F;
             word csr_addr = (instr >> 20) & 0xFFF;
+            word temp;
             switch (funct3)
             {
                 case 0b000:
@@ -77,6 +79,7 @@ int decode(rv32i *cpu,word instr){
                         cpu->pc = cpu-> mepc;
                         break;
                     default:
+                    cpu->sys_err_table|=UNDEFINED_OPCODE;
                         break;
                     }
                     break;
@@ -91,16 +94,19 @@ int decode(rv32i *cpu,word instr){
                         break;
                 }
                 case 0b001:
-                cpu->x[rd1] = *target_csr;
+                temp = *target_csr;
                 *target_csr = cpu->x[rs1];
+                cpu->x[rd1] = temp;
                     break;
                 case 0b010:
-                cpu->x[rd1] = *target_csr;
+                temp = *target_csr;
                 *target_csr |=cpu->x[rs1];
+                
                     break; 
                 case 0b011:
-                cpu->x[rd1] = *target_csr;
+                temp = *target_csr;
                 *target_csr &= ~(cpu->x[rs1]);
+                cpu->x[rd1] = temp;
                     break;
                 case 0b101:
                 cpu->x[rd1] = *target_csr;
@@ -166,7 +172,7 @@ int decode(rv32i *cpu,word instr){
                     write_word_to_address_space(address, data_to_store, cpu);//SW
                     break;
                 default:
-                    cpu->sys_err_table |= SLAVE_ERROR_MASK;
+                    cpu->sys_err_table|=UNDEFINED_OPCODE;
                     break;
             }
         break;
@@ -199,7 +205,7 @@ int decode(rv32i *cpu,word instr){
                 cpu->x[rd1] = (signed int)hword_val;
                 break;     
             default:
-                cpu->sys_err_table|=SLAVE_ERROR_MASK;
+                cpu->sys_err_table|=UNDEFINED_OPCODE;
                 break;
             }
                 
@@ -244,7 +250,7 @@ int decode(rv32i *cpu,word instr){
                     cpu->x[rd1] = cpu->x[rs1] & cpu->x[rs2]; //and
                     break;
                 default:
-                return -1;
+                cpu->sys_err_table|=UNDEFINED_OPCODE;
                     break;
             }
         break;
@@ -288,12 +294,12 @@ int decode(rv32i *cpu,word instr){
                     break;
                 
                 default:
-                    return -1;
+                cpu->sys_err_table|=UNDEFINED_OPCODE;
                     break;
                 }
                 break;
             default:
-                return -1;
+                cpu->sys_err_table|=UNDEFINED_OPCODE;
                 break;
             }
 
@@ -302,10 +308,9 @@ int decode(rv32i *cpu,word instr){
         default:
             cpu->sys_err_table |= UNDEFINED_OPCODE;
             cpu->pc = cpu->pc+4;
-            return -1;
             break;
         }
         cpu->pc = cpu->pc+4;
         cpu->x[0] = 0;
-        return 0;
+        return cpu->sys_err_table;
 }

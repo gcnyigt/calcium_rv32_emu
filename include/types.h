@@ -16,7 +16,7 @@ word mepc;
 word mcause;
 word mtval;
 word mstatus;
-unsigned int sys_err_table;
+int sys_err_table;
 } rv32i;
 typedef enum {
 FETCH_ERR_MASK      = 0b00000001,

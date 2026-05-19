@@ -146,8 +146,6 @@ word fetch_instr(rv32i*cpu){
         ptr = (word *)&bootrom_bin[aligned_addr];
         return *ptr;
         break;
-        
-        break;
     case 0x8:
         internal_addr = cpu->pc & 0xFFFF;
         cpu->sys_err_table |= ((0x8000 - 0x4) < internal_addr);//FETCH_ERR_MASK
